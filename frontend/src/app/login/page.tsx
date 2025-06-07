@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { logError } from "@/lib/logger";
+import api from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,18 +18,15 @@ export default function LoginPage() {
     setErro("");
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: senha }),
+      const response = await api.post("/auth/login", {
+        email,
+        password: senha,
       });
 
-      if (!response.ok) throw new Error("Credenciais inválidas");
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", response.data.token);
       router.push("/dashboard");
     } catch (err) {
+      logError(err, "Login");
       setErro("E-mail ou senha incorretos.");
     }
   }
