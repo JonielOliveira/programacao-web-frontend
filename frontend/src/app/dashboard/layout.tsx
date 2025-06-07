@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ReactNode } from "react";
+import { logout } from "@/lib/auth";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +18,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             Mensagens
           </Link>
         </nav>
+        <hr className="my-4 border-slate-600" />
+        <button
+          onClick={logout}
+          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded"
+        >
+          Sair
+        </button>
       </aside>
 
       {/* Conteúdo principal */}
