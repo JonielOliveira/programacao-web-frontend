@@ -1,7 +1,14 @@
+
 "use client";
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,43 +21,87 @@ import {
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 
-type Props = {
-  onUserCreated: () => void;
+type UserForm = {
+  id?: string;
+  username: string;
+  fullName: string;
+  email: string;
+  role: string;
+  status: string;
 };
 
-export default function CreateUserModal({ onUserCreated }: Props) {
+type Props = {
+  mode: "create" | "edit";
+  triggerLabel: string;
+  initialValues?: Partial<UserForm>;
+  onSuccess: () => void;
+};
+
+export default function UserModal({
+  mode,
+  triggerLabel,
+  initialValues,
+  onSuccess,
+}: Props) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<UserForm>({
     username: "",
     fullName: "",
     email: "",
-    role: "1", // 0: Admin, 1: User
+    role: "1",
     status: "A",
   });
+
+  useEffect(() => {
+    if (initialValues) {
+      setForm({
+        username: initialValues.username || "",
+        fullName: initialValues.fullName || "",
+        email: initialValues.email || "",
+        role: initialValues.role || "1",
+        status: initialValues.status || "A",
+        id: initialValues.id,
+      });
+    }
+  }, [initialValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
+    const { username, fullName, email, role, status, id } = form;
+
+    if (!username.trim() || !fullName.trim() || !email.trim() || !role || !status) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
     try {
-      await api.post("/users", form);
+      if (mode === "create") {
+        await api.post("/users", { username, fullName, email, role, status });
+      } else {
+        await api.put(`/users/${id}`, { username, fullName, email, role, status });
+      }
       setOpen(false);
-      setForm({ username: "", fullName: "", email: "", role: "1", status: "A" });
-      onUserCreated(); // recarrega a lista
+      onSuccess();
     } catch (err) {
-      logError(err, "criação de usuário");
+      logError(err, `${mode === "create" ? "criação" : "edição"} de usuário`);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Novo Usuário</Button>
+        <Button variant={mode === "edit" ? "outline" : "default"}>
+          {triggerLabel}
+        </Button>
       </DialogTrigger>
       <DialogContent className="space-y-4">
         <DialogHeader>
-          <DialogTitle>Criar novo usuário</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Criar novo usuário" : "Editar usuário"}
+          </DialogTitle>
         </DialogHeader>
 
         <Input
@@ -102,7 +153,7 @@ export default function CreateUserModal({ onUserCreated }: Props) {
         </Select>
 
         <Button onClick={handleSubmit} className="w-full">
-          Salvar
+          {mode === "create" ? "Criar" : "Salvar alterações"}
         </Button>
       </DialogContent>
     </Dialog>

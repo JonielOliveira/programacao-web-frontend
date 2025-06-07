@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
-import CreateUserModal from "./CreateUserModal";
+import UserModal from "./UserModal";
+import { Pencil } from "lucide-react"; // ícone de edição (via lucide)
+import { Button } from "@/components/ui/button";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -12,7 +14,8 @@ export default function UsersPage() {
 
   const fetchUsers = () => {
     setLoading(true);
-    api.get("/users")
+    api
+      .get("/users")
       .then((res) => setUsers(res.data))
       .catch((err) => {
         logError(err, "carregar usuários");
@@ -29,7 +32,7 @@ export default function UsersPage() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Usuários</h2>
-        <CreateUserModal onUserCreated={fetchUsers} />
+        <UserModal mode="create" triggerLabel="Novo Usuário" onSuccess={fetchUsers} />
       </div>
 
       {loading && <p>Carregando...</p>}
@@ -40,8 +43,24 @@ export default function UsersPage() {
 
       <ul className="space-y-2">
         {users.map((user) => (
-          <li key={user.id} className="p-2 bg-white rounded shadow">
-            {user.username}
+          <li
+            key={user.id}
+            className="p-4 bg-white rounded shadow flex items-center justify-between"
+          >
+            <div>
+              <p className="font-semibold">{user.username}</p>
+              <p className="text-sm text-gray-500">{user.email}</p>
+            </div>
+            <UserModal
+              mode="edit"
+              triggerLabel={
+                <Button size="icon" variant="ghost">
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              }
+              initialValues={user}
+              onSuccess={fetchUsers}
+            />
           </li>
         ))}
       </ul>
