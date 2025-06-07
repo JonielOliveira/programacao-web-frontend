@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -30,11 +29,13 @@ type UserForm = {
   status: string;
 };
 
+type Mode = "create" | "edit" | "view";
+
 type Props = {
-  mode: "create" | "edit";
+  mode: Mode;
   triggerLabel: string;
   initialValues?: Partial<UserForm>;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 };
 
 export default function UserModal({
@@ -51,6 +52,8 @@ export default function UserModal({
     role: "1",
     status: "A",
   });
+
+  const isView = mode === "view";
 
   useEffect(() => {
     if (initialValues) {
@@ -80,11 +83,11 @@ export default function UserModal({
     try {
       if (mode === "create") {
         await api.post("/users", { username, fullName, email, role, status });
-      } else {
+      } else if (mode === "edit" && id) {
         await api.put(`/users/${id}`, { username, fullName, email, role, status });
       }
       setOpen(false);
-      onSuccess();
+      onSuccess?.();
     } catch (err) {
       logError(err, `${mode === "create" ? "criação" : "edição"} de usuário`);
     }
@@ -100,7 +103,9 @@ export default function UserModal({
       <DialogContent className="space-y-4">
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "Criar novo usuário" : "Editar usuário"}
+            {mode === "create" && "Criar novo usuário"}
+            {mode === "edit" && "Editar usuário"}
+            {mode === "view" && "Visualizar usuário"}
           </DialogTitle>
         </DialogHeader>
 
@@ -110,6 +115,7 @@ export default function UserModal({
           value={form.username}
           onChange={handleChange}
           required
+          disabled={isView}
         />
         <Input
           name="fullName"
@@ -117,6 +123,7 @@ export default function UserModal({
           value={form.fullName}
           onChange={handleChange}
           required
+          disabled={isView}
         />
         <Input
           name="email"
@@ -124,11 +131,13 @@ export default function UserModal({
           value={form.email}
           onChange={handleChange}
           required
+          disabled={isView}
         />
 
         <Select
           value={form.role}
           onValueChange={(value) => setForm({ ...form, role: value })}
+          disabled={isView}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecione o papel" />
@@ -142,6 +151,7 @@ export default function UserModal({
         <Select
           value={form.status}
           onValueChange={(value) => setForm({ ...form, status: value })}
+          disabled={isView}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecione o status" />
@@ -152,9 +162,11 @@ export default function UserModal({
           </SelectContent>
         </Select>
 
-        <Button onClick={handleSubmit} className="w-full">
-          {mode === "create" ? "Criar" : "Salvar alterações"}
-        </Button>
+        {!isView && (
+          <Button onClick={handleSubmit} className="w-full">
+            {mode === "create" ? "Criar" : "Salvar alterações"}
+          </Button>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserModal from "./UserModal";
-import { Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { showSuccessToast } from "@/lib/showSuccessToast";
@@ -67,6 +67,18 @@ export default function UsersPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Visualizar */}
+              <UserModal
+                mode="view"
+                triggerLabel={
+                  <Button size="icon" variant="ghost">
+                    <Eye className="w-4 h-4 text-blue-600" />
+                  </Button>
+                }
+                initialValues={user}
+              />
+
+              {/* Editar */}
               <UserModal
                 mode="edit"
                 triggerLabel={
@@ -78,6 +90,7 @@ export default function UsersPage() {
                 onSuccess={fetchUsers}
               />
 
+              {/* Excluir */}
               <ConfirmDialog
                 title="Excluir usuário"
                 description={`Tem certeza que deseja excluir ${user.username}?`}
