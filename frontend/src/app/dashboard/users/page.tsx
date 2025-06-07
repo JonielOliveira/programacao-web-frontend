@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserModal from "./UserModal";
-import { Pencil } from "lucide-react"; // ícone de edição (via lucide)
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ConfirmDialog from "@/components/modals/ConfirmDialog";
+import { showSuccessToast } from "@/lib/showSuccessToast";
+import { showErrorToast } from "@/lib/showErrorToast";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -22,6 +25,17 @@ export default function UsersPage() {
         setErro("Erro ao carregar usuários.");
       })
       .finally(() => setLoading(false));
+  };
+
+  const handleDelete = async (userId: string) => {
+    try {
+      await api.delete(`/users/${userId}`);
+      showSuccessToast("Usuário excluído com sucesso.");
+      fetchUsers();
+    } catch (err) {
+      logError(err, "excluir usuário");
+      showErrorToast("Erro ao excluir usuário.");
+    }
   };
 
   useEffect(() => {
@@ -51,16 +65,30 @@ export default function UsersPage() {
               <p className="font-semibold">{user.username}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-            <UserModal
-              mode="edit"
-              triggerLabel={
-                <Button size="icon" variant="ghost">
-                  <Pencil className="w-4 h-4" />
-                </Button>
-              }
-              initialValues={user}
-              onSuccess={fetchUsers}
-            />
+
+            <div className="flex items-center gap-2">
+              <UserModal
+                mode="edit"
+                triggerLabel={
+                  <Button size="icon" variant="ghost">
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                }
+                initialValues={user}
+                onSuccess={fetchUsers}
+              />
+
+              <ConfirmDialog
+                title="Excluir usuário"
+                description={`Tem certeza que deseja excluir ${user.username}?`}
+                onConfirm={() => handleDelete(user.id)}
+                trigger={
+                  <Button size="icon" variant="ghost">
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </Button>
+                }
+              />
+            </div>
           </li>
         ))}
       </ul>
