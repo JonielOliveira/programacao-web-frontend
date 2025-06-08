@@ -14,12 +14,18 @@ export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
   const fetchUsers = () => {
     setLoading(true);
     api
-      .get("/users")
-      .then((res) => setUsers(res.data))
+      .get(`/users?page=${page}&limit=${limit}&orderBy=username&sort=asc`)
+      .then((res) => {
+        setUsers(res.data.data);
+        setTotalPages(res.data.totalPages);
+      })
       .catch((err) => {
         logError(err, "carregar usuários");
         setErro("Erro ao carregar usuários.");
@@ -40,7 +46,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page]);
 
   return (
     <div>
@@ -55,7 +61,7 @@ export default function UsersPage() {
         <p className="text-gray-500">Nenhum usuário encontrado.</p>
       )}
 
-      <ul className="space-y-2">
+      <ul className="space-y-2 mb-6">
         {users.map((user) => (
           <li
             key={user.id}
@@ -67,7 +73,6 @@ export default function UsersPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Visualizar */}
               <UserModal
                 mode="view"
                 triggerLabel={
@@ -77,8 +82,6 @@ export default function UsersPage() {
                 }
                 initialValues={user}
               />
-
-              {/* Editar */}
               <UserModal
                 mode="edit"
                 triggerLabel={
@@ -89,8 +92,6 @@ export default function UsersPage() {
                 initialValues={user}
                 onSuccess={fetchUsers}
               />
-
-              {/* Excluir */}
               <ConfirmDialog
                 title="Excluir usuário"
                 description={`Tem certeza que deseja excluir ${user.username}?`}
@@ -105,6 +106,22 @@ export default function UsersPage() {
           </li>
         ))}
       </ul>
+
+      {/* Paginação */}
+      <div className="flex justify-center items-center gap-4">
+        <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+          Anterior
+        </Button>
+        <span className="text-sm text-gray-700">
+          Página {page} de {totalPages}
+        </span>
+        <Button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          Próxima
+        </Button>
+      </div>
     </div>
   );
 }
