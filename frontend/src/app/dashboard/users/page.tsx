@@ -4,8 +4,16 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserModal from "./UserModal";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
@@ -16,21 +24,45 @@ export default function UsersPage() {
   const [erro, setErro] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10;
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState("all");
+  const [status, setStatus] = useState("all");
+  const limit = 8;
 
   const fetchUsers = () => {
     setLoading(true);
+
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      orderBy: "username",
+      sort: "asc",
+    });
+
+    if (search) params.append("search", search);
+    if (role !== "all") params.append("role", role);
+    if (status !== "all") params.append("status", status);
+
     api
-      .get(`/users?page=${page}&limit=${limit}&orderBy=username&sort=asc`)
+      .get(`/users?${params.toString()}`)
       .then((res) => {
         setUsers(res.data.data);
         setTotalPages(res.data.totalPages);
+        setPage(res.data.page);
+        setTotal(res.data.total);
       })
       .catch((err) => {
         logError(err, "carregar usuários");
         setErro("Erro ao carregar usuários.");
       })
       .finally(() => setLoading(false));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    fetchUsers();
   };
 
   const handleDelete = async (userId: string) => {
@@ -52,9 +84,60 @@ export default function UsersPage() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Usuários</h2>
-        <UserModal mode="create" triggerLabel="Novo Usuário" onSuccess={fetchUsers} />
+        <UserModal 
+          mode="create" 
+          triggerLabel={
+            <Button size="icon" variant="default" title="Novo usuário">
+              <UserPlus className="w-4 h-4" />
+            </Button>
+          } 
+          onSuccess={fetchUsers} 
+        />
       </div>
 
+      {/* Barra de filtros */}
+      <form onSubmit={handleSearch} className="mb-6 flex flex-wrap gap-2">
+        <Input
+          type="text"
+          placeholder="Buscar por nome ou email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-60"
+        />
+        <Select value={role} onValueChange={setRole}>
+          <SelectTrigger className="w-52">
+            <SelectValue placeholder="Filtrar por papel" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="0">Administrador</SelectItem>
+            <SelectItem value="1">Usuário Comum</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="w-52">
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="A">Ativo</SelectItem>
+            <SelectItem value="I">Inativo</SelectItem>
+            <SelectItem value="B">Bloqueado</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button type="submit" size="icon" title="Buscar">
+          <Search className="w-4 h-4" />
+        </Button>
+      </form>
+
+      {/* Total de registros */}
+      {!loading && total > 0 && (
+        <p className="text-sm text-gray-700 mb-2">
+          {total} usuário{total !== 1 && "s"} encontrado{total !== 1 && "s"}.
+        </p>
+      )}
+
+      {/* Lista */}
       {loading && <p>Carregando...</p>}
       {erro && <p className="text-red-500">{erro}</p>}
       {!loading && users.length === 0 && (
@@ -76,7 +159,7 @@ export default function UsersPage() {
               <UserModal
                 mode="view"
                 triggerLabel={
-                  <Button size="icon" variant="ghost">
+                  <Button size="icon" variant="ghost" title="Visualizar">
                     <Eye className="w-4 h-4 text-blue-600" />
                   </Button>
                 }
@@ -85,7 +168,7 @@ export default function UsersPage() {
               <UserModal
                 mode="edit"
                 triggerLabel={
-                  <Button size="icon" variant="ghost">
+                  <Button size="icon" variant="ghost" title="Editar">
                     <Pencil className="w-4 h-4" />
                   </Button>
                 }
@@ -97,7 +180,7 @@ export default function UsersPage() {
                 description={`Tem certeza que deseja excluir ${user.username}?`}
                 onConfirm={() => handleDelete(user.id)}
                 trigger={
-                  <Button size="icon" variant="ghost">
+                  <Button size="icon" variant="ghost" title="Excluir">
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>
                 }
@@ -109,7 +192,7 @@ export default function UsersPage() {
 
       {/* Paginação */}
       <div className="flex justify-center items-center gap-4">
-        <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+        <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page <= 1}>
           Anterior
         </Button>
         <span className="text-sm text-gray-700">
@@ -117,7 +200,7 @@ export default function UsersPage() {
         </span>
         <Button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-          disabled={page === totalPages}
+          disabled={page === 0 || page === totalPages}
         >
           Próxima
         </Button>
