@@ -6,38 +6,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { logout } from "@/lib/auth";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
-
-// Componente auxiliar para buscar e renderizar a foto autenticada
-function ProfilePhoto({ userId }: { userId: string }) {
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchPhoto = async () => {
-      try {
-        const response = await api.get(`/users/${userId}/photo`, {
-          responseType: "blob",
-        });
-        const url = URL.createObjectURL(response.data);
-        setPhotoUrl(url);
-      } catch (error) {
-        console.warn("Erro ao carregar a foto de perfil:", error);
-      }
-    };
-
-    fetchPhoto();
-  }, [userId]);
-
-  return (
-    <Image
-      src={photoUrl ?? "/default-user.png"}
-      alt="Foto de perfil"
-      width={48}
-      height={48}
-      className="rounded-full object-cover border border-white"
-      unoptimized
-    />
-  );
-}
+import UserProfileModal from "@/components/modals/UserProfileModal";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any>(null);
@@ -60,9 +29,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Perfil do usuário logado */}
         {user && (
           <div className="bg-slate-700 rounded p-4 text-center space-y-2">
-            <div className="flex justify-center">
-              <ProfilePhoto userId={user.id} />
-            </div>
+            <UserProfileModal
+              user={user}
+            />
             <div className="text-sm mt-2">
               <p className="font-semibold">{user.fullName}</p>
               <p className="text-gray-300 text-xs">{user.email}</p>
