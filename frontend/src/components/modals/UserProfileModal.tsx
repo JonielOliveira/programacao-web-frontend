@@ -14,7 +14,6 @@ import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { validatePasswordChange } from "@/lib/validatePassword";
 import { Camera } from "lucide-react";
 
-
 export default function UserProfileModal() {
   const [user, setUser] = useState<any>(null);
   const [username, setUsername] = useState("");
@@ -24,6 +23,7 @@ export default function UserProfileModal() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
     api
@@ -64,8 +64,12 @@ export default function UserProfileModal() {
     }
 
     try {
-      if (currentPassword || newPassword) {
-        const passwordError = validatePasswordChange(currentPassword, newPassword);
+      if (currentPassword || newPassword || confirmPassword) {
+        const passwordError = validatePasswordChange(
+          currentPassword,
+          newPassword,
+          confirmPassword
+        );
         if (passwordError) {
           showErrorToast(passwordError);
         } else {
@@ -77,7 +81,7 @@ export default function UserProfileModal() {
         }
       }
     } catch (err) {
-      logError(err, "atualizar perfil");
+      logError(err, "atualizar senha");
       showErrorToast("Erro ao atualizar senha: " + (err as Error).message);
     }
 
@@ -89,7 +93,7 @@ export default function UserProfileModal() {
         showSuccessToast("Foto atualizada com sucesso.");
       }
     } catch (err) {
-      logError(err, "atualizar perfil");
+      logError(err, "atualizar foto");
       showErrorToast("Erro ao atualizar foto: " + (err as Error).message);
     }
   };
@@ -111,12 +115,7 @@ export default function UserProfileModal() {
           </TabsList>
 
           <TabsContent value="dados" className="space-y-4">
-            <Input
-              placeholder="Nome de usuário"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled
-            />
+            <Input placeholder="Nome de usuário" value={username} disabled />
             <Input
               placeholder="Nome completo"
               value={fullName}
@@ -142,6 +141,12 @@ export default function UserProfileModal() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <Input
+              placeholder="Confirmar nova senha"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </TabsContent>
 
