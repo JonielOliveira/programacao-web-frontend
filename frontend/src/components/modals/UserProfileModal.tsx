@@ -89,7 +89,7 @@ export default function UserProfileModal() {
       if (photoFile) {
         const photoData = new FormData();
         photoData.append("photo", photoFile);
-        await api.post("/users/upload-photo", photoData);
+        await api.post(`/users/${user.id}/upload-photo`, photoData);
         showSuccessToast("Foto atualizada com sucesso.");
       }
     } catch (err) {
