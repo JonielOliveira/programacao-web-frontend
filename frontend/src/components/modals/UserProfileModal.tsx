@@ -11,6 +11,9 @@ import api from "@/lib/api";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
+import { validatePasswordChange } from "@/lib/validatePassword";
+import { Camera } from "lucide-react";
+
 
 export default function UserProfileModal() {
   const [user, setUser] = useState<any>(null);
@@ -43,34 +46,51 @@ export default function UserProfileModal() {
   const handleSubmit = async () => {
     if (!user) return;
 
-    if (!currentPassword) {
-      showErrorToast("Informe sua senha atual para confirmar.");
-      return;
+    try {
+      const hasChangedData =
+        fullName.trim() !== user.fullName.trim() ||
+        email.trim().toLowerCase() !== user.email.trim().toLowerCase();
+
+      if (hasChangedData) {
+        await api.put(`/users/${user.id}`, {
+          fullName,
+          email,
+        });
+        showSuccessToast("Dados atualizados com sucesso.");
+      }
+    } catch (err) {
+      logError(err, "atualizar perfil");
+      showErrorToast("Erro ao atualizar dados: " + (err as Error).message);
     }
 
     try {
-      await api.put(`/users/${user.id}`, {
-        fullName,
-        email,
-      });
-
-      if (newPassword) {
-        await api.post("/auth/change-password", {
-          currentPassword,
-          newPassword,
-        });
+      if (currentPassword || newPassword) {
+        const passwordError = validatePasswordChange(currentPassword, newPassword);
+        if (passwordError) {
+          showErrorToast(passwordError);
+        } else {
+          await api.post("/auth/change-password", {
+            currentPassword,
+            newPassword,
+          });
+          showSuccessToast("Senha atualizada com sucesso.");
+        }
       }
+    } catch (err) {
+      logError(err, "atualizar perfil");
+      showErrorToast("Erro ao atualizar senha: " + (err as Error).message);
+    }
 
+    try {
       if (photoFile) {
         const photoData = new FormData();
         photoData.append("photo", photoFile);
         await api.post("/users/upload-photo", photoData);
+        showSuccessToast("Foto atualizada com sucesso.");
       }
-
-      showSuccessToast("Perfil atualizado com sucesso.");
     } catch (err) {
       logError(err, "atualizar perfil");
-      showErrorToast("Erro ao atualizar perfil.");
+      showErrorToast("Erro ao atualizar foto: " + (err as Error).message);
     }
   };
 
@@ -112,7 +132,13 @@ export default function UserProfileModal() {
 
           <TabsContent value="senha" className="space-y-4">
             <Input
-              placeholder="Nova senha (opcional)"
+              placeholder="Senha atual"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+            <Input
+              placeholder="Nova senha"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -120,26 +146,40 @@ export default function UserProfileModal() {
           </TabsContent>
 
           <TabsContent value="foto" className="space-y-4">
-            <input type="file" accept="image/*" onChange={handlePhotoChange} />
-            {previewUrl && (
-              <Image
-                src={previewUrl}
-                alt="Prévia da foto"
-                width={96}
-                height={96}
-                className="rounded-full object-cover border"
-              />
-            )}
+            <div className="space-y-2 text-center">
+              <div className="flex justify-center">
+                {previewUrl ? (
+                  <Image
+                    src={previewUrl}
+                    alt="Prévia da foto"
+                    width={96}
+                    height={96}
+                    className="rounded-full object-cover border"
+                  />
+                ) : (
+                  user && <ProfilePhoto userId={user.id} />
+                )}
+              </div>
+              <div>
+                <input
+                  id="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+                <Button asChild variant="outline" className="flex items-center gap-2">
+                  <label htmlFor="photo" className="cursor-pointer">
+                    <Camera className="w-4 h-4" />
+                    Escolher foto
+                  </label>
+                </Button>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
 
         <div className="mt-4 space-y-2">
-          <Input
-            placeholder="Senha atual (obrigatória para salvar)"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
           <Button className="w-full" onClick={handleSubmit}>
             Salvar Alterações
           </Button>
