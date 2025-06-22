@@ -53,6 +53,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Link href="/dashboard/messages" className="block hover:text-slate-300">
             Mensagens
           </Link>
+          <Link href="/dashboard/invites" className="block hover:text-slate-300">
+            Convites
+          </Link>
         </nav>
 
         <hr className="my-4 border-slate-600" />
