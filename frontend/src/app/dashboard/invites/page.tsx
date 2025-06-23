@@ -10,6 +10,7 @@ import { UserPlus, Check, X, Trash2 } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
+import ProfilePhoto from "@/components/user/ProfilePhoto";
 
 export default function InvitesPage() {
   const [tab, setTab] = useState("received");
@@ -125,70 +126,62 @@ export default function InvitesPage() {
             <p className="text-gray-500">Nenhum convite {tab === "received" ? "recebido" : "enviado"}.</p>
           ) : (
             <ul className="space-y-2 mb-6">
-              {invites.map((invite) => (
-                <li
-                  key={invite.id}
-                  className="p-4 bg-white rounded shadow flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-semibold">
-                      {tab === "received"
-                        ? invite.sender?.username
-                        : invite.receiver?.username}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {tab === "received"
-                        ? invite.sender?.email
-                        : invite.receiver?.email}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    {tab === "received" ? (
-                      <>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          title="Aceitar"
-                          onClick={() => handleAction(invite.id, "accept")}
-                        >
-                          <Check className="w-4 h-4 text-green-600" />
-                        </Button>
-                        <ConfirmDialog
-                          title="Rejeitar convite"
-                          description={`Deseja realmente rejeitar o convite de ${invite.sender?.username}?`}
-                          confirmLabel="Confirmar"
-                          onConfirm={() => handleAction(invite.id, "reject")}
-                          trigger={
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              title="Rejeitar"
-                            >
-                              <X className="w-4 h-4 text-red-600" />
-                            </Button>
-                          }
-                        />
-                      </>
-                    ) : (
-                      <ConfirmDialog
-                        title="Excluir convite"
-                        description={`Deseja excluir o convite enviado para ${invite.receiver?.username}?`}
-                        confirmLabel="Confirmar"
-                        onConfirm={() => handleAction(invite.id, "cancel")}
-                        trigger={
+              {invites.map((invite) => {
+                const user = tab === "received" ? invite.sender : invite.receiver;
+
+                return (
+                  <li
+                    key={invite.id}
+                    className="p-4 bg-white rounded shadow flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-4">
+                      <ProfilePhoto userId={user?.id} size={48} />
+                      <div>
+                        <p className="font-semibold">{user?.username}</p>
+                        <p className="text-sm text-gray-500">{user?.fullName}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      {tab === "received" ? (
+                        <>
                           <Button
                             size="icon"
                             variant="ghost"
-                            title="Excluir"
+                            title="Aceitar"
+                            onClick={() => handleAction(invite.id, "accept")}
                           >
-                            <Trash2 className="w-4 h-4 text-red-600" />
+                            <Check className="w-4 h-4 text-green-600" />
                           </Button>
-                        }
-                      />
-                    )}
-                  </div>
-                </li>
-              ))}
+                          <ConfirmDialog
+                            title="Rejeitar convite"
+                            description={`Deseja realmente rejeitar o convite de ${user?.username}?`}
+                            confirmLabel="Confirmar"
+                            onConfirm={() => handleAction(invite.id, "reject")}
+                            trigger={
+                              <Button size="icon" variant="ghost" title="Rejeitar">
+                                <X className="w-4 h-4 text-red-600" />
+                              </Button>
+                            }
+                          />
+                        </>
+                      ) : (
+                        <ConfirmDialog
+                          title="Excluir convite"
+                          description={`Deseja excluir o convite enviado para ${user?.username}?`}
+                          confirmLabel="Confirmar"
+                          onConfirm={() => handleAction(invite.id, "cancel")}
+                          trigger={
+                            <Button size="icon" variant="ghost" title="Excluir">
+                              <Trash2 className="w-4 h-4 text-red-600" />
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
 
