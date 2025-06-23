@@ -66,15 +66,27 @@ export default function InvitesPage() {
   };
 
   const handleAction = async (id: string, action: "accept" | "reject" | "cancel") => {
+    const successMessages: Record<typeof action, string> = {
+      accept: "Convite aceito com sucesso.",
+      reject: "Convite rejeitado com sucesso.",
+      cancel: "Convite excluído com sucesso.",
+    };
+
+    const errorMessages: Record<typeof action, string> = {
+      accept: "Erro ao aceitar convite.",
+      reject: "Erro ao rejeitar convite.",
+      cancel: "Erro ao excluir convite.",
+    };
+
     try {
       const method = action === "cancel" ? "delete" : "post";
       const url = action === "cancel" ? `/invites/${id}/cancel` : `/invites/${id}/${action}`;
       await api[method](url);
       fetchInvites();
-      showSuccessToast(`Convite ${action === "cancel" ? "cancelado" : action + "ado"} com sucesso.`);
+      showSuccessToast(successMessages[action]);
     } catch (err) {
       logError(err, `convite ${action}`);
-      showErrorToast(`Erro ao ${action === "cancel" ? "cancelar" : action + "ar"} convite.`);
+      showErrorToast(errorMessages[action]);
     }
   };
 
