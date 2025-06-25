@@ -50,11 +50,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Link href="/dashboard/users" className="block hover:text-slate-300">
             Usuários
           </Link>
-          <Link href="/dashboard/messages" className="block hover:text-slate-300">
-            Mensagens
+          <Link href="/dashboard/connections" className="block hover:text-slate-300">
+            Conexões
           </Link>
           <Link href="/dashboard/invites" className="block hover:text-slate-300">
             Convites
+          </Link>
+          <Link href="/dashboard/messages" className="block hover:text-slate-300">
+            Mensagens
           </Link>
         </nav>
 
