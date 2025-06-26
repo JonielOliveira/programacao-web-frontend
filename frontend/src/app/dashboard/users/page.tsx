@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
-import UserModal from "./UserModal";
-import { Eye, Pencil, Trash2, Search, UserPlus } from "lucide-react";
+import UserModal from "@/components/modals/UserModal";
+import { Eye, Pencil, Trash2, Search, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +17,7 @@ import {
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
+import ProfilePhoto from "@/components/user/ProfilePhoto";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -150,9 +151,13 @@ export default function UsersPage() {
             key={user.id}
             className="p-4 bg-white rounded shadow flex items-center justify-between"
           >
-            <div>
-              <p className="font-semibold">{user.username}</p>
-              <p className="text-sm text-gray-500">{user.email}</p>
+            <div className="flex items-center gap-4">
+              <ProfilePhoto userId={user?.id} size={48} />
+              <div>
+                <p className="font-semibold">{user?.fullName}</p>
+                <p className="text-sm text-gray-700">{user?.email}</p>
+                <p className="text-sm text-gray-500">@{user?.username}</p>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -192,7 +197,12 @@ export default function UsersPage() {
 
       {/* Paginação */}
       <div className="flex justify-center items-center gap-4">
-        <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page <= 1}>
+        <Button 
+          onClick={() => setPage((p) => Math.max(p - 1, 1))} 
+          disabled={page <= 1}
+          title="Página anterior"
+        >
+          <ChevronLeft className="w-4 h-4" />
           Anterior
         </Button>
         <span className="text-sm text-gray-700">
@@ -201,8 +211,10 @@ export default function UsersPage() {
         <Button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === 0 || page === totalPages}
+          title="Próxima página"
         >
           Próxima
+          <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

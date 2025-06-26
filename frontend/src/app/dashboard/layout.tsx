@@ -3,7 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ReactNode, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth";
+import { Users, Link2, Mail, LogOut } from "lucide-react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserProfileModal from "@/components/modals/UserProfileModal";
@@ -24,11 +26,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-slate-800 text-white p-4 space-y-4">
-        <h2 className="text-xl font-bold mb-4">Painel</h2>
-
+        <div className="mb-4 flex justify-center" title="Logo do Painel">
+          <Image
+            src="/logo1.png"
+            alt="Logo do Painel"
+            width={200}
+            height={80}
+            priority
+          />
+        </div>
+        
         {/* Perfil do usuário logado */}
         {user && (
-          <div className="bg-slate-700 rounded p-4 text-center space-y-2">
+          <div className="bg-slate-700 rounded p-4 text-center space-y-2" title="Abrir perfil do usuário">
             <UserProfileModal
               user={user}
             />
@@ -47,29 +57,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Navegação */}
         <nav className="space-y-2 mt-4">
-          <Link href="/dashboard/users" className="block hover:text-slate-300">
-            Usuários
+          <Link href="/dashboard/users" className="flex items-center gap-2 hover:text-slate-300" title="Usuários">
+            <Users className="w-4 h-4 mr-4" /> Usuários
           </Link>
-          <Link href="/dashboard/connections" className="block hover:text-slate-300">
-            Conexões
+          <Link href="/dashboard/connections" className="flex items-center gap-2 hover:text-slate-300" title="Conexões">
+            <Link2 className="w-4 h-4 mr-2" /> Conexões
           </Link>
-          <Link href="/dashboard/invites" className="block hover:text-slate-300">
+          <Link href="/dashboard/invites" className="flex items-center gap-2 hover:text-slate-300" title="Convites">
+            <Mail className="w-4 h-4 mr-2" />
             Convites
-          </Link>
-          <Link href="/dashboard/messages" className="block hover:text-slate-300">
-            Mensagens
           </Link>
         </nav>
 
         <hr className="my-4 border-slate-600" />
 
         {/* Botão de logout */}
-        <button
-          onClick={logout}
-          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded"
+        <Button
+          onClick={logout} 
+          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded" 
+          size="default" 
+          variant="ghost" 
+          title="Sair"
         >
+          <LogOut className="w-4 h-4" />
           Sair
-        </button>
+        </Button>
       </aside>
 
       {/* Conteúdo principal */}

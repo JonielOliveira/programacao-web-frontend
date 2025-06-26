@@ -6,7 +6,7 @@ import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { UserPlus, Check, X, Trash2 } from "lucide-react";
+import { MailPlus, Check, X, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
@@ -106,8 +106,8 @@ export default function InvitesPage() {
           onChange={(e) => setUsername(e.target.value)}
           className="w-80"
         />
-        <Button onClick={handleSendInvite}>
-          <UserPlus className="w-4 h-4 mr-2" />
+        <Button onClick={handleSendInvite} title="Enviar convite" disabled={!username.trim()}> 
+          <MailPlus className="w-4 h-4 mr-2" />
           Enviar
         </Button>
       </div>
@@ -115,8 +115,8 @@ export default function InvitesPage() {
       {/* Abas */}
       <Tabs value={tab} onValueChange={setTab} className="w-full mb-6">
         <TabsList className="mb-4">
-          <TabsTrigger value="received">Recebidos</TabsTrigger>
-          <TabsTrigger value="sent">Enviados</TabsTrigger>
+          <TabsTrigger value="received" title="Convites recebidos">Recebidos</TabsTrigger>
+          <TabsTrigger value="sent" title="Convites enviados">Enviados</TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab}>
@@ -137,8 +137,8 @@ export default function InvitesPage() {
                     <div className="flex items-center gap-4">
                       <ProfilePhoto userId={user?.id} size={48} />
                       <div>
-                        <p className="font-semibold">{user?.username}</p>
-                        <p className="text-sm text-gray-500">{user?.fullName}</p>
+                        <p className="font-semibold">{user?.fullName}</p>
+                        <p className="text-sm text-gray-500">@{user?.username}</p>
                       </div>
                     </div>
 
@@ -187,7 +187,12 @@ export default function InvitesPage() {
 
           {/* Paginação */}
           <div className="flex justify-center items-center gap-4">
-            <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page <= 1}>
+            <Button 
+              onClick={() => setPage((p) => Math.max(p - 1, 1))} 
+              disabled={page <= 1} 
+              title="Página anterior"
+            >
+              <ChevronLeft className="w-4 h-4" />
               Anterior
             </Button>
             <span className="text-sm text-gray-700">
@@ -196,8 +201,10 @@ export default function InvitesPage() {
             <Button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === 0 || page === totalPages}
+              title="Próxima página"
             >
               Próxima
+              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </TabsContent>

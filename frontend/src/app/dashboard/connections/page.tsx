@@ -5,7 +5,7 @@ import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Search, MessageCircle } from "lucide-react";
+import { Trash2, Search, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
@@ -106,8 +106,8 @@ export default function ConnectionsPage() {
               <div className="flex items-center gap-4">
                 <ProfilePhoto userId={conn.user.id} size={48} />
                 <div>
-                  <p className="font-semibold">{conn.user.username}</p>
-                  <p className="text-sm text-gray-500">{conn.user.fullName}</p>
+                  <p className="font-semibold">{conn.user.fullName}</p>
+                  <p className="text-sm text-gray-500">@{conn.user.username}</p>
                 </div>
               </div>
 
@@ -139,7 +139,12 @@ export default function ConnectionsPage() {
       )}
 
       <div className="flex justify-center items-center gap-4">
-        <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page <= 1}>
+        <Button 
+          onClick={() => setPage((p) => Math.max(p - 1, 1))} 
+          disabled={page <= 1}
+          title="Página anterior"
+        >
+          <ChevronLeft className="w-4 h-4" />
           Anterior
         </Button>
         <span className="text-sm text-gray-700">
@@ -148,8 +153,10 @@ export default function ConnectionsPage() {
         <Button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === 0 || page === totalPages}
+          title="Próxima página"
         >
           Próxima
+          <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
 
