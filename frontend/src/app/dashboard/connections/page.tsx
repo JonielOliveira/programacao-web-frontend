@@ -5,11 +5,12 @@ import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Search } from "lucide-react";
+import { Trash2, Search, MessageCircle } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
+import ChatModal from "@/components/modals/ChatModal";
 
 export default function ConnectionsPage() {
   const [connections, setConnections] = useState<any[]>([]);
@@ -17,6 +18,8 @@ export default function ConnectionsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [openChatId, setOpenChatId] = useState<string | null>(null);
+  const [chatUser, setChatUser] = useState<any>(null);
   const limit = 8;
 
   const fetchConnections = async () => {
@@ -61,11 +64,21 @@ export default function ConnectionsPage() {
     }
   };
 
+  const handleOpenChat = async (connectionId: string, user: any) => {
+    try {
+      const res = await api.get(`/conversations/connection/${connectionId}`);
+      setOpenChatId(res.data.id);
+      setChatUser(user);
+    } catch (err) {
+      logError(err, "abrir chat");
+      showErrorToast("Erro ao abrir conversa.");
+    }
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Minhas Conexões</h2>
 
-      {/* Barra de busca */}
       <form onSubmit={handleSearch} className="mb-6 flex gap-2">
         <Input
           type="text"
@@ -79,7 +92,6 @@ export default function ConnectionsPage() {
         </Button>
       </form>
 
-      {/* Lista de conexões */}
       {loading ? (
         <p>Carregando...</p>
       ) : connections.length === 0 ? (
@@ -99,23 +111,33 @@ export default function ConnectionsPage() {
                 </div>
               </div>
 
-              <ConfirmDialog
-                title="Remover conexão"
-                description={`Deseja remover a conexão com ${conn.user.username}?`}
-                confirmLabel="Confirmar"
-                onConfirm={() => handleRemove(conn.id)}
-                trigger={
-                  <Button size="icon" variant="ghost" title="Remover conexão">
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </Button>
-                }
-              />
+              <div className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  title="Abrir conversa"
+                  onClick={() => handleOpenChat(conn.id, conn.user)}
+                >
+                  <MessageCircle className="w-4 h-4 text-blue-600" />
+                </Button>
+
+                <ConfirmDialog
+                  title="Remover conexão"
+                  description={`Deseja remover a conexão com ${conn.user.username}?`}
+                  confirmLabel="Confirmar"
+                  onConfirm={() => handleRemove(conn.id)}
+                  trigger={
+                    <Button size="icon" variant="ghost" title="Remover conexão">
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </Button>
+                  }
+                />
+              </div>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Paginação */}
       <div className="flex justify-center items-center gap-4">
         <Button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page <= 1}>
           Anterior
@@ -130,6 +152,20 @@ export default function ConnectionsPage() {
           Próxima
         </Button>
       </div>
+
+      {openChatId && chatUser && (
+        <ChatModal
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setOpenChatId(null);
+              setChatUser(null);
+            }
+          }}
+          conversationId={openChatId}
+          user={chatUser}
+        />
+      )}
     </div>
   );
 }
