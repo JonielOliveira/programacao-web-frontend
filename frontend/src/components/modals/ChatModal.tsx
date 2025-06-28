@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
 import api from "@/lib/api";
@@ -170,18 +170,24 @@ export default function ChatModal({
         </div>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
+          onSubmit={(e) => e.preventDefault()}
           className="mt-4 flex gap-2"
         >
-          <Input
+          <Textarea
             placeholder="Digite sua mensagem..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            rows={2}
+            className="max-h-40 overflow-y-auto resize-none"
           />
-          <Button type="submit">
+
+          <Button type="button" onClick={handleSend}>
             <Send className="w-4 h-4 mr-1" /> Enviar
           </Button>
         </form>

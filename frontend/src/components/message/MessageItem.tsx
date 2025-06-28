@@ -29,7 +29,7 @@ export default function MessageItem({
   onEdit,
   onDelete,
 }: MessageItemProps) {
-  const baseClasses = "p-2 rounded text-sm max-w-[80%]";
+  const baseClasses = "p-2 rounded text-sm max-w-[80%] break-words whitespace-pre-wrap";
   let bubbleClasses = "";
   if (isOwnMessage) {
     if (isDeleted) {
