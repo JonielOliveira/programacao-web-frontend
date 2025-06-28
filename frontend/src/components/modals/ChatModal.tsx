@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -42,11 +42,16 @@ export default function ChatModal({
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = async () => {
     try {
       const res = await api.get(`/conversations/${conversationId}/messages`);
-      setMessages(res.data);
+      setMessages((prev) => {
+        const serializedPrev = JSON.stringify(prev);
+        const serializedNew = JSON.stringify(res.data);
+        return serializedPrev !== serializedNew ? res.data : prev;
+      });
     } catch (err) {
       logError(err, "carregar mensagens");
       showErrorToast("Erro ao carregar mensagens.");
@@ -67,69 +72,76 @@ export default function ChatModal({
     }
   };
 
-    const handleEditMessage = async (id: string) => {
+  const handleEditMessage = async (id: string) => {
     const newContent = prompt("Editar mensagem:");
     if (!newContent || !newContent.trim()) return;
 
     try {
-        const res = await api.put(`/conversations/${conversationId}/messages/${id}`, {
+      const res = await api.put(`/conversations/${conversationId}/messages/${id}`, {
         content: newContent.trim(),
-        });
+      });
 
-        setMessages((prev) =>
+      setMessages((prev) =>
         prev.map((msg) => (msg.id === id ? { ...msg, ...res.data } : msg))
-        );
+      );
     } catch (err) {
-        logError(err, "editar mensagem");
-        showErrorToast("Erro ao editar mensagem.");
+      logError(err, "editar mensagem");
+      showErrorToast("Erro ao editar mensagem.");
     }
-    };
+  };
 
-    const handleDeleteMessage = async (id: string) => {
+  const handleDeleteMessage = async (id: string) => {
     if (!confirm("Deseja realmente excluir esta mensagem?")) return;
 
     try {
-        await api.delete(`/conversations/${conversationId}/messages/${id}`);
+      await api.delete(`/conversations/${conversationId}/messages/${id}`);
 
-        setMessages((prev) =>
-        prev.map((msg) => (msg.id === id ? { ...msg, isDeleted: true, content: null } : msg))
-        );
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === id ? { ...msg, isDeleted: true, content: null } : msg
+        )
+      );
     } catch (err) {
-        logError(err, "excluir mensagem");
-        showErrorToast("Erro ao excluir mensagem.");
+      logError(err, "excluir mensagem");
+      showErrorToast("Erro ao excluir mensagem.");
     }
-    };
-
-
-
-
-
-
-
-
-
-
-
-
+  };
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    const startPolling = async () => {
+      await fetchMessages();
+      interval = setInterval(() => {
+        fetchMessages();
+      }, 5000); // a cada 5 segundos
+    };
+
     if (open) {
       setLoading(true);
-      fetchMessages().finally(() => setLoading(false));
+      startPolling().finally(() => setLoading(false));
     }
-  }, [open]);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [open, conversationId]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full max-w-lg h-[70vh] flex flex-col">
         <DialogHeader>
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <ProfilePhoto userId={user.id} size={48} />
             <div>
-            <DialogTitle className="text-base leading-tight">{user.fullName}</DialogTitle>
-            <p className="text-sm text-gray-500">@{user.username}</p>
+              <DialogTitle className="text-base leading-tight">{user.fullName}</DialogTitle>
+              <p className="text-sm text-gray-500">@{user.username}</p>
             </div>
-        </div>
+          </div>
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden">
@@ -147,10 +159,11 @@ export default function ChatModal({
                     isOwnMessage={msg.isOwnMessage}
                     isDeleted={msg.isDeleted}
                     isUpdated={msg.isUpdated}
-                    onEdit={(id) => handleEditMessage(id)}
-                    onDelete={(id) => handleDeleteMessage(id)}
+                    onEdit={handleEditMessage}
+                    onDelete={handleDeleteMessage}
                   />
                 ))}
+                <div ref={scrollRef} />
               </div>
             </ScrollArea>
           )}
