@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -18,6 +20,7 @@ export default function LoginPage() {
   const [recoveryEmail, setRecoveryEmail] = useState("");
   const [recoveryMessage, setRecoveryMessage] = useState("");
   const [recoveryError, setRecoveryError] = useState("");
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -62,7 +65,16 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-bold text-center">Entrar no Sistema</h1>
+        <div className="flex justify-center">
+          <Image
+            src="/logo3.png"
+            alt="Logo do Join & Chat"
+            width={200}
+            height={80}
+            priority
+          />
+        </div>
+        <h1 className="text-2xl font-bold text-center">Acessar Conta</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">E-mail</label>
@@ -70,7 +82,22 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Senha</label>
-            <Input value={senha} onChange={(e) => setSenha(e.target.value)} type="password" />
+            <div className="relative">
+              <Input
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                type={senhaVisivel ? "text" : "password"}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setSenhaVisivel(!senhaVisivel)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                tabIndex={-1}
+              >
+                {senhaVisivel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           {erro && <p className="text-red-500 text-sm">{erro}</p>}
           <Button className="w-full" type="submit">Entrar</Button>
