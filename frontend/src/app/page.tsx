@@ -1,12 +1,19 @@
-import { Button } from "@/components/ui/button";
+"use client";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="space-y-4 text-center">
-        <h1 className="text-2xl font-bold">Olá, mundo!</h1>
-        <Button>Me clique</Button>
-      </div>
-    </main>
-  );
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "@/lib/auth";
+
+export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/login");
+    }
+  }, []);
+
+  return null;
 }
