@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserModal from "@/components/modals/UserModal";
@@ -18,9 +18,10 @@ import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
+import { User } from "@/types/user";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const [page, setPage] = useState(1);
@@ -31,7 +32,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState("all");
   const limit = 8;
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     setLoading(true);
 
     const params = new URLSearchParams({
@@ -58,7 +59,7 @@ export default function UsersPage() {
         setErro("Erro ao carregar usuários.");
       })
       .finally(() => setLoading(false));
-  };
+  }, [page, limit, search, role, status]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +80,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page]);
+  }, [fetchUsers]);
 
   return (
     <div>
@@ -87,7 +88,7 @@ export default function UsersPage() {
         <h2 className="text-xl font-bold">Usuários</h2>
         <UserModal 
           mode="create" 
-          triggerLabel={
+          triggerButton={
             <Button size="icon" variant="default" title="Novo usuário">
               <UserPlus className="w-4 h-4" />
             </Button>
@@ -163,7 +164,7 @@ export default function UsersPage() {
             <div className="flex items-center gap-2">
               <UserModal
                 mode="view"
-                triggerLabel={
+                triggerButton={
                   <Button size="icon" variant="ghost" title="Visualizar">
                     <Eye className="w-4 h-4 text-blue-600" />
                   </Button>
@@ -172,7 +173,7 @@ export default function UsersPage() {
               />
               <UserModal
                 mode="edit"
-                triggerLabel={
+                triggerButton={
                   <Button size="icon" variant="ghost" title="Editar">
                     <Pencil className="w-4 h-4" />
                   </Button>
