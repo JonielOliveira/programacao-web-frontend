@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,24 @@ import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { validatePasswordChange } from "@/lib/validatePassword";
 import { Camera } from "lucide-react";
+import { User } from "@/types/user";
 
-export default function UserProfileModal() {
-  const [user, setUser] = useState<any>(null);
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+interface UserProfileModalProps {
+  user: User;
+  onUserUpdate?: (updatedUser: User) => void;
+  photoVersion: number;
+  onPhotoUpdate: () => void;
+}
+
+export default function UserProfileModal({
+  user,
+  onUserUpdate,
+  photoVersion,
+  onPhotoUpdate,
+}: UserProfileModalProps) {
+  const [username, setUsername] = useState(user.username);
+  const [fullName, setFullName] = useState(user.fullName);
+  const [email, setEmail] = useState(user.email);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -26,16 +38,10 @@ export default function UserProfileModal() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setUser(res.data);
-        setUsername(res.data.username);
-        setFullName(res.data.fullName);
-        setEmail(res.data.email);
-      })
-      .catch((err) => logError(err, "carregar perfil"));
-  }, []);
+    setUsername(user.username);
+    setFullName(user.fullName);
+    setEmail(user.email);
+  }, [user]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -44,19 +50,16 @@ export default function UserProfileModal() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
-
     try {
       const hasChangedData =
         fullName.trim() !== user.fullName.trim() ||
         email.trim().toLowerCase() !== user.email.trim().toLowerCase();
 
       if (hasChangedData) {
-        await api.put(`/users/${user.id}`, {
-          fullName,
-          email,
-        });
+        await api.put(`/users/${user.id}`, { fullName, email });
         showSuccessToast("Dados atualizados com sucesso.");
+        const updatedUser = { ...user, fullName, email };
+        onUserUpdate?.(updatedUser);
       }
     } catch (err) {
       logError(err, "atualizar perfil");
@@ -91,6 +94,8 @@ export default function UserProfileModal() {
         photoData.append("photo", photoFile);
         await api.post(`/users/${user.id}/upload-photo`, photoData);
         showSuccessToast("Foto atualizada com sucesso.");
+        onPhotoUpdate();
+        setPreviewUrl(null);
       }
     } catch (err) {
       logError(err, "atualizar foto");
@@ -102,11 +107,13 @@ export default function UserProfileModal() {
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex justify-center cursor-pointer">
-          {user && <ProfilePhoto userId={user.id} />}
+          <ProfilePhoto userId={user.id} version={photoVersion} />
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-md">
-        <h2 className="text-lg font-bold mb-4">Editar Perfil</h2>
+        <DialogTitle className="text-lg font-bold mb-4">
+          Editar Perfil
+        </DialogTitle>
         <Tabs defaultValue="dados" className="w-full">
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="dados">Dados</TabsTrigger>
@@ -162,7 +169,7 @@ export default function UserProfileModal() {
                     className="rounded-full object-cover border"
                   />
                 ) : (
-                  user && <ProfilePhoto userId={user.id} />
+                  <ProfilePhoto userId={user.id} version={photoVersion} />
                 )}
               </div>
               <div>
