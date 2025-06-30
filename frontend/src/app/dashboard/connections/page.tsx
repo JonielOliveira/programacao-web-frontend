@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
@@ -11,18 +11,19 @@ import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import ChatModal from "@/components/modals/ChatModal";
+import { ConnectionUser, Connection } from "@/types/connection";
 
 export default function ConnectionsPage() {
-  const [connections, setConnections] = useState<any[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [openChatId, setOpenChatId] = useState<string | null>(null);
-  const [chatUser, setChatUser] = useState<any>(null);
+  const [chatUser, setChatUser] = useState<ConnectionUser | null>(null);
   const limit = 8;
 
-  const fetchConnections = async () => {
+  const fetchConnections = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -41,11 +42,11 @@ export default function ConnectionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, search]);
 
   useEffect(() => {
     fetchConnections();
-  }, [page]);
+  }, [fetchConnections]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +65,7 @@ export default function ConnectionsPage() {
     }
   };
 
-  const handleOpenChat = async (connectionId: string, user: any) => {
+  const handleOpenChat = async (connectionId: string, user: ConnectionUser) => {
     try {
       const res = await api.get(`/conversations/connection/${connectionId}`);
       setOpenChatId(res.data.id);
