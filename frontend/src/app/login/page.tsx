@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { logError } from "@/lib/logger";
 import api from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
@@ -26,7 +26,7 @@ export default function LoginPage() {
     if (isAuthenticated()) {
       router.replace("/dashboard");
     }
-  }, []);
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -110,7 +110,9 @@ export default function LoginPage() {
             </button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
-            <h2 className="text-lg font-semibold mb-2 text-center">Recuperar Acesso</h2>
+            <DialogTitle className="text-lg font-semibold mb-2 text-center">
+              Recuperar Acesso
+            </DialogTitle>
             <form onSubmit={handleRecoverySubmit} className="space-y-4">
               <Input
                 placeholder="Digite seu e-mail"
