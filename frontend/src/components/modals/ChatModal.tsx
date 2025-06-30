@@ -16,6 +16,8 @@ import { logError } from "@/lib/logger";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import MessageItem from "@/components/message/MessageItem";
+import EditMessageModal from "@/components/message/EditMessageModal";
+import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { ConnectionUser } from "@/types/connection";
 
 interface ChatModalProps {
@@ -45,6 +47,10 @@ export default function ChatModal({
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
+
   const fetchMessages = useCallback(async () => {
     try {
       const res = await api.get(`/conversations/${conversationId}/messages`);
@@ -73,38 +79,54 @@ export default function ChatModal({
     }
   };
 
-  const handleEditMessage = async (id: string) => {
-    const newContent = prompt("Editar mensagem:");
-    if (!newContent || !newContent.trim()) return;
+  const handleEditMessage = (id: string) => {
+    const message = messages.find((msg) => msg.id === id);
+    if (message && message.content) {
+      setEditingMessageId(id);
+      setEditingContent(message.content);
+    }
+  };
+
+  const confirmEditMessage = async (newContent: string) => {
+    if (!editingMessageId) return;
 
     try {
-      const res = await api.put(`/conversations/${conversationId}/messages/${id}`, {
-        content: newContent.trim(),
+      const res = await api.put(`/conversations/${conversationId}/messages/${editingMessageId}`, {
+        content: newContent,
       });
 
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === id ? { ...msg, ...res.data } : msg))
+        prev.map((msg) =>
+          msg.id === editingMessageId ? { ...msg, ...res.data } : msg
+        )
       );
     } catch (err) {
       logError(err, "editar mensagem");
       showErrorToast("Erro ao editar mensagem.");
+    } finally {
+      setEditingMessageId(null);
     }
   };
 
-  const handleDeleteMessage = async (id: string) => {
-    if (!confirm("Deseja realmente excluir esta mensagem?")) return;
+  const handleDeleteMessage = (id: string) => {
+    setDeletingMessageId(id);
+  };
+
+  const confirmDeleteMessage = async () => {
+    if (!deletingMessageId) return;
 
     try {
-      await api.delete(`/conversations/${conversationId}/messages/${id}`);
-
+      await api.delete(`/conversations/${conversationId}/messages/${deletingMessageId}`);
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === id ? { ...msg, isDeleted: true, content: null } : msg
+          msg.id === deletingMessageId ? { ...msg, isDeleted: true, content: null } : msg
         )
       );
     } catch (err) {
       logError(err, "excluir mensagem");
       showErrorToast("Erro ao excluir mensagem.");
+    } finally {
+      setDeletingMessageId(null);
     }
   };
 
@@ -115,7 +137,7 @@ export default function ChatModal({
       await fetchMessages();
       interval = setInterval(() => {
         fetchMessages();
-      }, 5000); // a cada 5 segundos
+      }, 5000);
     };
 
     if (open) {
@@ -133,66 +155,86 @@ export default function ChatModal({
   }, [messages]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-lg h-[70vh] flex flex-col">
-        <DialogHeader>
-          <div className="flex items-center gap-3">
-            <ProfilePhoto userId={user.id} size={48} />
-            <div>
-              <DialogTitle className="text-base leading-tight">{user.fullName}</DialogTitle>
-              <p className="text-sm text-gray-500">@{user.username}</p>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-hidden">
-          {loading ? (
-            <p className="text-center text-gray-500 mt-4">Carregando...</p>
-          ) : (
-            <ScrollArea className="h-full pr-2">
-              <div className="flex flex-col gap-3">
-                {messages.map((msg) => (
-                  <MessageItem
-                    key={msg.id}
-                    id={msg.id}
-                    content={msg.content}
-                    sentAt={new Date(msg.sentAt)}
-                    isOwnMessage={msg.isOwnMessage}
-                    isDeleted={msg.isDeleted}
-                    isUpdated={msg.isUpdated}
-                    onEdit={handleEditMessage}
-                    onDelete={handleDeleteMessage}
-                  />
-                ))}
-                <div ref={scrollRef} />
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="w-full max-w-lg h-[70vh] flex flex-col">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <ProfilePhoto userId={user.id} size={48} />
+              <div>
+                <DialogTitle className="text-base leading-tight">{user.fullName}</DialogTitle>
+                <p className="text-sm text-gray-500">@{user.username}</p>
               </div>
-            </ScrollArea>
-          )}
-        </div>
+            </div>
+          </DialogHeader>
 
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="mt-4 flex gap-2"
-        >
-          <Textarea
-            placeholder="Digite sua mensagem..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            rows={2}
-            className="max-h-40 overflow-y-auto resize-none"
-          />
+          <div className="flex-1 overflow-hidden">
+            {loading ? (
+              <p className="text-center text-gray-500 mt-4">Carregando...</p>
+            ) : (
+              <ScrollArea className="h-full pr-2">
+                <div className="flex flex-col gap-3">
+                  {messages.map((msg) => (
+                    <MessageItem
+                      key={msg.id}
+                      id={msg.id}
+                      content={msg.content}
+                      sentAt={new Date(msg.sentAt)}
+                      isOwnMessage={msg.isOwnMessage}
+                      isDeleted={msg.isDeleted}
+                      isUpdated={msg.isUpdated}
+                      onEdit={handleEditMessage}
+                      onDelete={handleDeleteMessage}
+                    />
+                  ))}
+                  <div ref={scrollRef} />
+                </div>
+              </ScrollArea>
+            )}
+          </div>
 
-          <Button className="cursor-pointer" type="button" onClick={handleSend}>
-            <Send className="w-4 h-4 mr-1" /> Enviar
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <form onSubmit={(e) => e.preventDefault()} className="mt-4 flex gap-2">
+            <Textarea
+              placeholder="Digite sua mensagem..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              rows={2}
+              className="max-h-40 overflow-y-auto resize-none"
+            />
+
+            <Button className="cursor-pointer" type="button" onClick={handleSend}>
+              <Send className="w-4 h-4 mr-1" /> Enviar
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de edição de mensagem */}
+      {editingMessageId && (
+        <EditMessageModal
+          open={!!editingMessageId}
+          originalContent={editingContent}
+          onClose={() => setEditingMessageId(null)}
+          onConfirm={confirmEditMessage}
+        />
+      )}
+
+      {/* Modal de confirmação de exclusão */}
+      {deletingMessageId && (
+        <ConfirmDialog
+          open={!!deletingMessageId}
+          title="Excluir mensagem"
+          description="Deseja realmente excluir esta mensagem?"
+          onClose={() => setDeletingMessageId(null)}
+          onConfirm={confirmDeleteMessage}
+        />
+      )}
+    </>
   );
 }

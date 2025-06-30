@@ -17,7 +17,9 @@ type Props = {
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void;
-  trigger: React.ReactNode;
+  onClose?: () => void;
+  open?: boolean;
+  trigger?: React.ReactNode;
 };
 
 export default function ConfirmDialog({
@@ -26,25 +28,43 @@ export default function ConfirmDialog({
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
   onConfirm,
+  onClose,
+  open: controlledOpen,
   trigger,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const handleCancel = () => {
+    if (!isControlled) setInternalOpen(false);
+    onClose?.();
+  };
 
   const handleConfirm = () => {
     onConfirm();
-    setOpen(false);
+    handleCancel();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (isControlled) {
+          if (!v) onClose?.();
+        } else {
+          setInternalOpen(v);
+        }
+      }}
+    >
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <p>{description}</p>
         <DialogFooter className="mt-4">
-          <Button className="cursor-pointer" variant="ghost" onClick={() => setOpen(false)}>
+          <Button className="cursor-pointer" variant="ghost" onClick={handleCancel}>
             {cancelLabel}
           </Button>
           <Button className="cursor-pointer" variant="destructive" onClick={handleConfirm}>

@@ -69,12 +69,12 @@ export default function MessageItem({
         {!isDeleted && isOwnMessage && (
           <ContextMenuContent className="w-36">
             {onEdit && (
-              <ContextMenuItem onClick={() => onEdit(id)}>
+              <ContextMenuItem className="cursor-pointer" onClick={() => onEdit(id)}>
                 Editar
               </ContextMenuItem>
             )}
             {onDelete && (
-              <ContextMenuItem onClick={() => onDelete(id)}>
+              <ContextMenuItem className="cursor-pointer" onClick={() => onDelete(id)}>
                 Excluir
               </ContextMenuItem>
             )}

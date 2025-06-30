@@ -38,13 +38,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-800 text-white p-4 space-y-4">
         <div className="mb-4 flex justify-center" title="Logo do Painel">
-          <Image
-            src="/logo1.png"
-            alt="Logo do Painel"
-            width={200}
-            height={80}
-            priority
-          />
+          <Link href="/dashboard">
+            <Image
+              src="/logo1.png"
+              alt="Painel"
+              width={200}
+              height={80}
+              priority
+            />
+          </Link>
         </div>
 
         {/* Perfil do usuário logado */}
