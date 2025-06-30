@@ -26,7 +26,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
-    // setPhotoVersion((v) => v + 1);
   };
 
   const handlePhotoUpdate = () => {

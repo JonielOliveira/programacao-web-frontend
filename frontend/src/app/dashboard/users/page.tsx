@@ -43,7 +43,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");
-  const limit = 8;
+  const limit = 5;
 
   const fetchUsers = useCallback(() => {
     setLoading(true);
@@ -166,7 +166,7 @@ export default function UsersPage() {
             className="p-4 bg-white rounded shadow flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
-              <ProfilePhoto userId={user?.id} size={48} />
+              <ProfilePhoto userId={user?.id} size={72} />
               <div>
                 <p className="font-semibold">{user?.fullName}</p>
                 <p className="text-sm text-gray-700">{user?.email}</p>

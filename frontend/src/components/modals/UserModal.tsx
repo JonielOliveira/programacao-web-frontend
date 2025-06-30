@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
+import { showErrorToast } from "@/lib/showErrorToast";
+import { showSuccessToast } from "@/lib/showSuccessToast";
 
 type UserForm = {
   id?: string;
@@ -76,20 +78,24 @@ export default function UserModal({
     const { username, fullName, email, role, status, id } = form;
 
     if (!username.trim() || !fullName.trim() || !email.trim() || !role || !status) {
-      alert("Preencha todos os campos obrigatórios.");
+      showErrorToast("Preencha todos os campos obrigatórios.");
       return;
     }
 
     try {
       if (mode === "create") {
         await api.post("/users", { username, fullName, email, role, status });
+        showSuccessToast("Usuário criado com sucesso.");
       } else if (mode === "edit" && id) {
         await api.put(`/users/${id}`, { username, fullName, email, role, status });
+        showSuccessToast("Usuário atualizado com sucesso.");
       }
+
       setOpen(false);
       onSuccess?.();
     } catch (err) {
       logError(err, `${mode === "create" ? "criação" : "edição"} de usuário`);
+      showErrorToast(`Erro ao ${mode === "create" ? "criar" : "atualizar"} o usuário.`);
     }
   };
 
@@ -157,6 +163,9 @@ export default function UserModal({
           <SelectContent className="w-full">
             <SelectItem className="cursor-pointer" value="A">Ativo</SelectItem>
             <SelectItem className="cursor-pointer" value="I">Inativo</SelectItem>
+            {isView && (
+              <SelectItem className="cursor-pointer" value="B">Bloqueado</SelectItem>
+            )}
           </SelectContent>
         </Select>
 
