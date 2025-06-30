@@ -11,7 +11,7 @@ export default function DashboardHome() {
     if (!isAuthenticated()) {
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   return (
     <div>
