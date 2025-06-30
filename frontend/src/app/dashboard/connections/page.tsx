@@ -88,7 +88,7 @@ export default function ConnectionsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-80"
         />
-        <Button type="submit" size="icon" title="Buscar">
+        <Button className="cursor-pointer" type="submit" size="icon" title="Buscar">
           <Search className="w-4 h-4" />
         </Button>
       </form>
@@ -114,6 +114,7 @@ export default function ConnectionsPage() {
 
               <div className="flex items-center gap-2">
                 <Button
+                  className="cursor-pointer"
                   size="icon"
                   variant="ghost"
                   title="Abrir conversa"
@@ -128,7 +129,7 @@ export default function ConnectionsPage() {
                   confirmLabel="Confirmar"
                   onConfirm={() => handleRemove(conn.id)}
                   trigger={
-                    <Button size="icon" variant="ghost" title="Remover conexão">
+                    <Button className="cursor-pointer" size="icon" variant="ghost" title="Remover conexão">
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </Button>
                   }
@@ -140,7 +141,8 @@ export default function ConnectionsPage() {
       )}
 
       <div className="flex justify-center items-center gap-4">
-        <Button 
+        <Button
+          className="cursor-pointer" 
           onClick={() => setPage((p) => Math.max(p - 1, 1))} 
           disabled={page <= 1}
           title="Página anterior"
@@ -152,6 +154,7 @@ export default function ConnectionsPage() {
           Página {page} de {totalPages}
         </span>
         <Button
+          className="cursor-pointer"
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === 0 || page === totalPages}
           title="Próxima página"

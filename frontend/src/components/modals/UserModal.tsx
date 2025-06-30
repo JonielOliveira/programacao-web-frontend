@@ -137,12 +137,12 @@ export default function UserModal({
           onValueChange={(value) => setForm({ ...form, role: value })}
           disabled={isView}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full cursor-pointer">
             <SelectValue placeholder="Selecione o papel" />
           </SelectTrigger>
           <SelectContent className="w-full">
-            <SelectItem value="0">Administrador</SelectItem>
-            <SelectItem value="1">Usuário Comum</SelectItem>
+            <SelectItem className="cursor-pointer" value="0">Administrador</SelectItem>
+            <SelectItem className="cursor-pointer" value="1">Usuário Comum</SelectItem>
           </SelectContent>
         </Select>
 
@@ -151,17 +151,17 @@ export default function UserModal({
           onValueChange={(value) => setForm({ ...form, status: value })}
           disabled={isView}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full cursor-pointer">
             <SelectValue placeholder="Selecione o status" />
           </SelectTrigger>
           <SelectContent className="w-full">
-            <SelectItem value="A">Ativo</SelectItem>
-            <SelectItem value="I">Inativo</SelectItem>
+            <SelectItem className="cursor-pointer" value="A">Ativo</SelectItem>
+            <SelectItem className="cursor-pointer" value="I">Inativo</SelectItem>
           </SelectContent>
         </Select>
 
         {!isView && (
-          <Button onClick={handleSubmit} className="w-full">
+          <Button onClick={handleSubmit} className="w-full cursor-pointer">
             {mode === "create" ? "Criar" : "Salvar alterações"}
           </Button>
         )}

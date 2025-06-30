@@ -102,7 +102,7 @@ export default function UsersPage() {
         <UserModal 
           mode="create" 
           triggerButton={
-            <Button size="icon" variant="default" title="Novo usuário">
+            <Button className="cursor-pointer" size="icon" variant="default" title="Novo usuário">
               <UserPlus className="w-4 h-4" />
             </Button>
           } 
@@ -120,27 +120,27 @@ export default function UsersPage() {
           className="w-60"
         />
         <Select value={role} onValueChange={setRole}>
-          <SelectTrigger className="w-52">
+          <SelectTrigger className="w-52 cursor-pointer">
             <SelectValue placeholder="Filtrar por papel" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="0">Administrador</SelectItem>
-            <SelectItem value="1">Usuário Comum</SelectItem>
+            <SelectItem className="cursor-pointer" value="all">Todos</SelectItem>
+            <SelectItem className="cursor-pointer" value="0">Administrador</SelectItem>
+            <SelectItem className="cursor-pointer" value="1">Usuário Comum</SelectItem>
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-52">
+          <SelectTrigger className="w-52 cursor-pointer">
             <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="A">Ativo</SelectItem>
-            <SelectItem value="I">Inativo</SelectItem>
-            <SelectItem value="B">Bloqueado</SelectItem>
+            <SelectItem className="cursor-pointer" value="all">Todos</SelectItem>
+            <SelectItem className="cursor-pointer" value="A">Ativo</SelectItem>
+            <SelectItem className="cursor-pointer" value="I">Inativo</SelectItem>
+            <SelectItem className="cursor-pointer" value="B">Bloqueado</SelectItem>
           </SelectContent>
         </Select>
-        <Button type="submit" size="icon" title="Buscar">
+        <Button className="cursor-pointer" type="submit" size="icon" title="Buscar">
           <Search className="w-4 h-4" />
         </Button>
       </form>
@@ -197,7 +197,7 @@ export default function UsersPage() {
               <UserModal
                 mode="view"
                 triggerButton={
-                  <Button size="icon" variant="ghost" title="Visualizar">
+                  <Button className="cursor-pointer" size="icon" variant="ghost" title="Visualizar">
                     <Eye className="w-4 h-4 text-blue-600" />
                   </Button>
                 }
@@ -206,7 +206,7 @@ export default function UsersPage() {
               <UserModal
                 mode="edit"
                 triggerButton={
-                  <Button size="icon" variant="ghost" title="Editar">
+                  <Button className="cursor-pointer" size="icon" variant="ghost" title="Editar">
                     <Pencil className="w-4 h-4" />
                   </Button>
                 }
@@ -218,7 +218,7 @@ export default function UsersPage() {
                 description={`Tem certeza que deseja excluir ${user.username}?`}
                 onConfirm={() => handleDelete(user.id)}
                 trigger={
-                  <Button size="icon" variant="ghost" title="Excluir">
+                  <Button className="cursor-pointer" size="icon" variant="ghost" title="Excluir">
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>
                 }
@@ -230,7 +230,8 @@ export default function UsersPage() {
 
       {/* Paginação */}
       <div className="flex justify-center items-center gap-4">
-        <Button 
+        <Button
+          className="cursor-pointer" 
           onClick={() => setPage((p) => Math.max(p - 1, 1))} 
           disabled={page <= 1}
           title="Página anterior"
@@ -242,6 +243,7 @@ export default function UsersPage() {
           Página {page} de {totalPages}
         </span>
         <Button
+          className="cursor-pointer"
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === 0 || page === totalPages}
           title="Próxima página"

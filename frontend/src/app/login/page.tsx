@@ -55,7 +55,7 @@ export default function LoginPage() {
       await api.post("/auth/request-password-reset", {
         email: recoveryEmail,
       });
-      setRecoveryMessage("Verifique seu e-mail para a senha temporária.");
+      setRecoveryMessage("Verifique seu e-mail para obter a senha temporária.");
     } catch (err) {
       logError(err, "Solicitar senha temporária");
       setRecoveryError("Erro ao solicitar senha. Verifique o e-mail informado.");
@@ -92,7 +92,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setSenhaVisivel(!senhaVisivel)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {senhaVisivel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -100,12 +100,12 @@ export default function LoginPage() {
             </div>
           </div>
           {erro && <p className="text-red-500 text-sm">{erro}</p>}
-          <Button className="w-full" type="submit">Entrar</Button>
+          <Button className="w-full cursor-pointer" type="submit">Entrar</Button>
         </form>
 
         <Dialog>
           <DialogTrigger asChild>
-            <button className="text-sm text-blue-600 hover:underline block w-full text-center mt-2">
+            <button className="text-sm text-blue-600 hover:underline block w-full text-center mt-2 cursor-pointer">
               Primeiro acesso ou esqueceu a senha?
             </button>
           </DialogTrigger>
@@ -122,7 +122,7 @@ export default function LoginPage() {
               />
               {recoveryMessage && <p className="text-green-600 text-sm">{recoveryMessage}</p>}
               {recoveryError && <p className="text-red-500 text-sm">{recoveryError}</p>}
-              <Button className="w-full" type="submit">Enviar senha temporária</Button>
+              <Button className="w-full cursor-pointer" type="submit">Enviar senha temporária</Button>
             </form>
           </DialogContent>
         </Dialog>

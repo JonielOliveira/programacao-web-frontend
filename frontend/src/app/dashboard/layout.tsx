@@ -103,7 +103,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Botão de logout */}
         <Button
           onClick={logout}
-          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded"
+          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded cursor-pointer"
           size="default"
           variant="ghost"
           title="Sair"

@@ -44,10 +44,10 @@ export default function ConfirmDialog({
         </DialogHeader>
         <p>{description}</p>
         <DialogFooter className="mt-4">
-          <Button variant="ghost" onClick={() => setOpen(false)}>
+          <Button className="cursor-pointer" variant="ghost" onClick={() => setOpen(false)}>
             {cancelLabel}
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
+          <Button className="cursor-pointer" variant="destructive" onClick={handleConfirm}>
             {confirmLabel}
           </Button>
         </DialogFooter>

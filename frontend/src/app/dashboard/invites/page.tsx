@@ -113,7 +113,7 @@ export default function InvitesPage() {
           onChange={(e) => setUsername(e.target.value)}
           className="w-80"
         />
-        <Button onClick={handleSendInvite} title="Enviar convite" disabled={!username.trim()}> 
+        <Button className="cursor-pointer" onClick={handleSendInvite} title="Enviar convite" disabled={!username.trim()}> 
           <MailPlus className="w-4 h-4 mr-2" />
           Enviar
         </Button>
@@ -152,6 +152,7 @@ export default function InvitesPage() {
                       {tab === "received" ? (
                         <>
                           <Button
+                            className="cursor-pointer"
                             size="icon"
                             variant="ghost"
                             title="Aceitar"
@@ -165,7 +166,7 @@ export default function InvitesPage() {
                             confirmLabel="Confirmar"
                             onConfirm={() => handleAction(invite.id, "reject")}
                             trigger={
-                              <Button size="icon" variant="ghost" title="Rejeitar">
+                              <Button className="cursor-pointer" size="icon" variant="ghost" title="Rejeitar">
                                 <X className="w-4 h-4 text-red-600" />
                               </Button>
                             }
@@ -178,7 +179,7 @@ export default function InvitesPage() {
                           confirmLabel="Confirmar"
                           onConfirm={() => handleAction(invite.id, "cancel")}
                           trigger={
-                            <Button size="icon" variant="ghost" title="Excluir">
+                            <Button className="cursor-pointer" size="icon" variant="ghost" title="Excluir">
                               <Trash2 className="w-4 h-4 text-red-600" />
                             </Button>
                           }
@@ -193,7 +194,8 @@ export default function InvitesPage() {
 
           {/* Paginação */}
           <div className="flex justify-center items-center gap-4">
-            <Button 
+            <Button
+              className="cursor-pointer" 
               onClick={() => setPage((p) => Math.max(p - 1, 1))} 
               disabled={page <= 1} 
               title="Página anterior"
@@ -205,6 +207,7 @@ export default function InvitesPage() {
               Página {page} de {totalPages}
             </span>
             <Button
+              className="cursor-pointer"
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === 0 || page === totalPages}
               title="Próxima página"

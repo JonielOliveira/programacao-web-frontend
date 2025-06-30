@@ -188,7 +188,7 @@ export default function ChatModal({
             className="max-h-40 overflow-y-auto resize-none"
           />
 
-          <Button type="button" onClick={handleSend}>
+          <Button className="cursor-pointer" type="button" onClick={handleSend}>
             <Send className="w-4 h-4 mr-1" /> Enviar
           </Button>
         </form>

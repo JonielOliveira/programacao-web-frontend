@@ -192,7 +192,7 @@ export default function UserProfileModal({
         </Tabs>
 
         <div className="mt-4 space-y-2">
-          <Button className="w-full" onClick={handleSubmit}>
+          <Button className="w-full cursor-pointer" onClick={handleSubmit}>
             Salvar Alterações
           </Button>
         </div>
