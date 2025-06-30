@@ -8,16 +8,17 @@ interface ProfilePhotoProps {
   userId: string;
   size?: number;
   className?: string;
+  version?: number;
   onClick?: () => void;
 }
 
-export default function ProfilePhoto({ userId, size = 72, className = "", onClick }: ProfilePhotoProps) {
+export default function ProfilePhoto({ userId, size = 72, className = "", version = 0, onClick }: ProfilePhotoProps) {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPhoto = async () => {
       try {
-        const response = await api.get(`/users/${userId}/photo`, {
+        const response = await api.get(`/users/${userId}/photo?v=${version}`, {
           responseType: "blob",
         });
         const url = URL.createObjectURL(response.data);
@@ -28,7 +29,7 @@ export default function ProfilePhoto({ userId, size = 72, className = "", onClic
     };
 
     fetchPhoto();
-  }, [userId]);
+  }, [userId, version]);
 
   return (
     <Image
