@@ -9,9 +9,11 @@ import { Users, Link2, Mail, LogOut } from "lucide-react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import UserProfileModal from "@/components/modals/UserProfileModal";
+import { User } from "@/types/user";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [photoVersion, setPhotoVersion] = useState(0);
 
   useEffect(() => {
     api
@@ -21,6 +23,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         logError(err, "carregar usuário autenticado");
       });
   }, []);
+
+  const handleUserUpdate = (updatedUser: User) => {
+    setUser(updatedUser);
+    // setPhotoVersion((v) => v + 1);
+  };
+
+  const handlePhotoUpdate = () => {
+    setPhotoVersion((v) => v + 1);
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -35,12 +46,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             priority
           />
         </div>
-        
+
         {/* Perfil do usuário logado */}
         {user && (
-          <div className="bg-slate-700 rounded p-4 text-center space-y-2" title="Abrir perfil do usuário">
+          <div
+            className="bg-slate-700 rounded p-4 text-center space-y-2"
+            title="Abrir perfil do usuário"
+          >
             <UserProfileModal
               user={user}
+              photoVersion={photoVersion}
+              onUserUpdate={handleUserUpdate}
+              onPhotoUpdate={handlePhotoUpdate}
             />
             <div className="text-sm mt-2">
               <p className="font-semibold">{user.fullName}</p>
@@ -57,13 +74,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Navegação */}
         <nav className="space-y-2 mt-4">
-          <Link href="/dashboard/users" className="flex items-center gap-2 hover:text-slate-300" title="Usuários">
+          <Link
+            href="/dashboard/users"
+            className="flex items-center gap-2 hover:text-slate-300"
+            title="Usuários"
+          >
             <Users className="w-4 h-4 mr-4" /> Usuários
           </Link>
-          <Link href="/dashboard/connections" className="flex items-center gap-2 hover:text-slate-300" title="Conexões">
+          <Link
+            href="/dashboard/connections"
+            className="flex items-center gap-2 hover:text-slate-300"
+            title="Conexões"
+          >
             <Link2 className="w-4 h-4 mr-2" /> Conexões
           </Link>
-          <Link href="/dashboard/invites" className="flex items-center gap-2 hover:text-slate-300" title="Convites">
+          <Link
+            href="/dashboard/invites"
+            className="flex items-center gap-2 hover:text-slate-300"
+            title="Convites"
+          >
             <Mail className="w-4 h-4 mr-2" />
             Convites
           </Link>
@@ -73,10 +102,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Botão de logout */}
         <Button
-          onClick={logout} 
-          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded" 
-          size="default" 
-          variant="ghost" 
+          onClick={logout}
+          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded"
+          size="default"
+          variant="ghost"
           title="Sair"
         >
           <LogOut className="w-4 h-4" />
