@@ -33,14 +33,14 @@ type Mode = "create" | "edit" | "view";
 
 type Props = {
   mode: Mode;
-  triggerLabel: string;
+  triggerButton: React.ReactNode;
   initialValues?: Partial<UserForm>;
   onSuccess?: () => void;
 };
 
 export default function UserModal({
   mode,
-  triggerLabel,
+  triggerButton,
   initialValues,
   onSuccess,
 }: Props) {
@@ -96,9 +96,7 @@ export default function UserModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={mode === "edit" ? "outline" : "default"}>
-          {triggerLabel}
-        </Button>
+        {triggerButton}
       </DialogTrigger>
       <DialogContent className="space-y-4">
         <DialogHeader>
