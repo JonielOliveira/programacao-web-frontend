@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,19 @@ import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
+import { InviteUser, SentInvite, ReceivedInvite } from "@/types/invite";
+
+function getInviteUser(invite: SentInvite | ReceivedInvite, tab: string): InviteUser {
+  return tab === "received"
+    ? (invite as ReceivedInvite).sender
+    : (invite as SentInvite).receiver;
+}
 
 export default function InvitesPage() {
   const [tab, setTab] = useState("received");
 
-  const [sentInvites, setSentInvites] = useState<any[]>([]);
-  const [receivedInvites, setReceivedInvites] = useState<any[]>([]);
+  const [sentInvites, setSentInvites] = useState<SentInvite[]>([]);
+  const [receivedInvites, setReceivedInvites] = useState<ReceivedInvite[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState("");
@@ -25,7 +32,7 @@ export default function InvitesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 8;
 
-  const fetchInvites = async () => {
+  const fetchInvites = useCallback(async () => {
     setLoading(true);
     try {
       const route = tab === "received" ? "/invites/received" : "/invites/sent";
@@ -48,11 +55,11 @@ export default function InvitesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tab, page, limit]);
 
   useEffect(() => {
     fetchInvites();
-  }, [tab, page]);
+  }, [fetchInvites]);
 
   const handleSendInvite = async () => {
     try {
@@ -127,8 +134,7 @@ export default function InvitesPage() {
           ) : (
             <ul className="space-y-2 mb-6">
               {invites.map((invite) => {
-                const user = tab === "received" ? invite.sender : invite.receiver;
-
+                const user = getInviteUser(invite, tab);
                 return (
                   <li
                     key={invite.id}
