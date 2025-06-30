@@ -16,10 +16,11 @@ import { logError } from "@/lib/logger";
 import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import MessageItem from "@/components/message/MessageItem";
+import { ConnectionUser } from "@/types/connection";
 
 interface ChatModalProps {
   conversationId: string;
-  user: { id: string; username: string; fullName: string };
+  user: ConnectionUser;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
