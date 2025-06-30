@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -44,7 +44,7 @@ export default function ChatModal({
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const res = await api.get(`/conversations/${conversationId}/messages`);
       setMessages((prev) => {
@@ -56,7 +56,7 @@ export default function ChatModal({
       logError(err, "carregar mensagens");
       showErrorToast("Erro ao carregar mensagens.");
     }
-  };
+  }, [conversationId]);
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -125,7 +125,7 @@ export default function ChatModal({
     return () => {
       clearInterval(interval);
     };
-  }, [open, conversationId]);
+  }, [open, conversationId, fetchMessages]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
