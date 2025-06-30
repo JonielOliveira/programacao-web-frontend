@@ -116,9 +116,9 @@ export default function UserProfileModal({
         </DialogTitle>
         <Tabs defaultValue="dados" className="w-full">
           <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="dados">Dados</TabsTrigger>
-            <TabsTrigger value="senha">Senha</TabsTrigger>
-            <TabsTrigger value="foto">Foto</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="dados">Dados</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="senha">Senha</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="foto">Foto</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados" className="space-y-4">

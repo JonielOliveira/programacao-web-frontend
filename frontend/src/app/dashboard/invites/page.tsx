@@ -122,8 +122,8 @@ export default function InvitesPage() {
       {/* Abas */}
       <Tabs value={tab} onValueChange={setTab} className="w-full mb-6">
         <TabsList className="mb-4">
-          <TabsTrigger value="received" title="Convites recebidos">Recebidos</TabsTrigger>
-          <TabsTrigger value="sent" title="Convites enviados">Enviados</TabsTrigger>
+          <TabsTrigger className="cursor-pointer" value="received" title="Convites recebidos">Recebidos</TabsTrigger>
+          <TabsTrigger className="cursor-pointer" value="sent" title="Convites enviados">Enviados</TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab}>
