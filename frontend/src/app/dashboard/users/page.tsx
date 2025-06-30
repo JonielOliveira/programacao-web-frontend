@@ -20,6 +20,19 @@ import { showErrorToast } from "@/lib/showErrorToast";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { User } from "@/types/user";
 
+function getStatusInfo(status: string | undefined) {
+  switch (status) {
+    case "A":
+      return { text: "Ativo", color: "text-green-600" };
+    case "I":
+      return { text: "Inativo", color: "text-gray-500" };
+    case "B":
+      return { text: "Bloqueado", color: "text-red-600" };
+    default:
+      return { text: "Desconhecido", color: "text-gray-500" };
+  }
+};
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,7 +170,26 @@ export default function UsersPage() {
               <div>
                 <p className="font-semibold">{user?.fullName}</p>
                 <p className="text-sm text-gray-700">{user?.email}</p>
-                <p className="text-sm text-gray-500">@{user?.username}</p>
+                <p className="text-sm font-semibold">
+                  @
+                  <span className="text-sm text-gray-500">
+                    {user?.username}
+                  </span>
+                </p>
+                <p className="text-sm font-semibold">
+                  Acessos:{" "}
+                  <span className="text-sm text-gray-500">
+                    {user?.accessCount}
+                  </span>
+                </p>                
+                {user?.status && (
+                  <p className="text-sm font-semibold">
+                    Status:{" "}
+                    <span className={`font-medium ${getStatusInfo(user.status).color}`}>
+                      {getStatusInfo(user.status).text}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
 
