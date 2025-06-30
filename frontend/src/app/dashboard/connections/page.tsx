@@ -1,5 +1,6 @@
 "use client";
 
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
@@ -77,106 +78,108 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Minhas Conexões</h2>
+    <ProtectedRoute>
+      <div>
+        <h2 className="text-xl font-bold mb-4">Minhas Conexões</h2>
 
-      <form onSubmit={handleSearch} className="mb-6 flex gap-2">
-        <Input
-          type="text"
-          placeholder="Buscar por nome ou username..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-80"
-        />
-        <Button className="cursor-pointer" type="submit" size="icon" title="Buscar">
-          <Search className="w-4 h-4" />
-        </Button>
-      </form>
+        <form onSubmit={handleSearch} className="mb-6 flex gap-2">
+          <Input
+            type="text"
+            placeholder="Buscar por nome ou username..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-80"
+          />
+          <Button className="cursor-pointer" type="submit" size="icon" title="Buscar">
+            <Search className="w-4 h-4" />
+          </Button>
+        </form>
 
-      {loading ? (
-        <p>Carregando...</p>
-      ) : connections.length === 0 ? (
-        <p className="text-gray-500">Nenhuma conexão encontrada.</p>
-      ) : (
-        <ul className="space-y-2 mb-6">
-          {connections.map((conn) => (
-            <li
-              key={conn.id}
-              className="p-4 bg-white rounded shadow flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <ProfilePhoto userId={conn.user.id} size={48} />
-                <div>
-                  <p className="font-semibold">{conn.user.fullName}</p>
-                  <p className="text-sm text-gray-500">@{conn.user.username}</p>
+        {loading ? (
+          <p>Carregando...</p>
+        ) : connections.length === 0 ? (
+          <p className="text-gray-500">Nenhuma conexão encontrada.</p>
+        ) : (
+          <ul className="space-y-2 mb-6">
+            {connections.map((conn) => (
+              <li
+                key={conn.id}
+                className="p-4 bg-white rounded shadow flex items-center justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <ProfilePhoto userId={conn.user.id} size={48} />
+                  <div>
+                    <p className="font-semibold">{conn.user.fullName}</p>
+                    <p className="text-sm text-gray-500">@{conn.user.username}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  className="cursor-pointer"
-                  size="icon"
-                  variant="ghost"
-                  title="Abrir conversa"
-                  onClick={() => handleOpenChat(conn.id, conn.user)}
-                >
-                  <MessageCircle className="w-4 h-4 text-blue-600" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="cursor-pointer"
+                    size="icon"
+                    variant="ghost"
+                    title="Abrir conversa"
+                    onClick={() => handleOpenChat(conn.id, conn.user)}
+                  >
+                    <MessageCircle className="w-4 h-4 text-blue-600" />
+                  </Button>
 
-                <ConfirmDialog
-                  title="Remover conexão"
-                  description={`Deseja remover a conexão com ${conn.user.username}?`}
-                  confirmLabel="Confirmar"
-                  onConfirm={() => handleRemove(conn.id)}
-                  trigger={
-                    <Button className="cursor-pointer" size="icon" variant="ghost" title="Remover conexão">
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </Button>
-                  }
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+                  <ConfirmDialog
+                    title="Remover conexão"
+                    description={`Deseja remover a conexão com ${conn.user.username}?`}
+                    confirmLabel="Confirmar"
+                    onConfirm={() => handleRemove(conn.id)}
+                    trigger={
+                      <Button className="cursor-pointer" size="icon" variant="ghost" title="Remover conexão">
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    }
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <div className="flex justify-center items-center gap-4">
-        <Button
-          className="cursor-pointer" 
-          onClick={() => setPage((p) => Math.max(p - 1, 1))} 
-          disabled={page <= 1}
-          title="Página anterior"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Anterior
-        </Button>
-        <span className="text-sm text-gray-700">
-          Página {page} de {totalPages}
-        </span>
-        <Button
-          className="cursor-pointer"
-          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-          disabled={page === 0 || page === totalPages}
-          title="Próxima página"
-        >
-          Próxima
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            className="cursor-pointer" 
+            onClick={() => setPage((p) => Math.max(p - 1, 1))} 
+            disabled={page <= 1}
+            title="Página anterior"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Anterior
+          </Button>
+          <span className="text-sm text-gray-700">
+            Página {page} de {totalPages}
+          </span>
+          <Button
+            className="cursor-pointer"
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+            disabled={page === 0 || page === totalPages}
+            title="Próxima página"
+          >
+            Próxima
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {openChatId && chatUser && (
+          <ChatModal
+            open={true}
+            onOpenChange={(open) => {
+              if (!open) {
+                setOpenChatId(null);
+                setChatUser(null);
+              }
+            }}
+            conversationId={openChatId}
+            user={chatUser}
+          />
+        )}
       </div>
-
-      {openChatId && chatUser && (
-        <ChatModal
-          open={true}
-          onOpenChange={(open) => {
-            if (!open) {
-              setOpenChatId(null);
-              setChatUser(null);
-            }
-          }}
-          conversationId={openChatId}
-          user={chatUser}
-        />
-      )}
-    </div>
+    </ProtectedRoute>
   );
 }

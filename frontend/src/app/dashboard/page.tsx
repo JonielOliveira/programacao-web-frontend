@@ -1,22 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function DashboardHome() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push("/login");
-    }
-  }, [router]);
-
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Bem-vindo ao Join & Chat!</h1>
-      <p className="text-gray-600 mt-2">Escolha uma opção no menu à esquerda.</p>
-    </div>
+    <ProtectedRoute>
+      <div>
+        <h1 className="text-2xl font-bold">Bem-vindo ao Join & Chat!</h1>
+        <p className="text-gray-600 mt-2">Escolha uma opção no menu à esquerda.</p>
+      </div>
+    </ProtectedRoute>
   );
 }
