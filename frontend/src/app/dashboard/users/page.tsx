@@ -1,6 +1,6 @@
 "use client";
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AdminRoute from "@/components/auth/AdminRoute";
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
@@ -97,7 +97,7 @@ export default function UsersPage() {
   }, [fetchUsers]);
 
   return (
-    <ProtectedRoute>
+    <AdminRoute>
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Usuários</h2>
@@ -255,6 +255,6 @@ export default function UsersPage() {
           </Button>
         </div>
       </div>
-    </ProtectedRoute>
+    </AdminRoute>
   );
 }

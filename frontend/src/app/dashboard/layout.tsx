@@ -75,13 +75,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Navegação */}
         <nav className="space-y-2 mt-4">
-          <Link
-            href="/dashboard/users"
-            className="flex items-center gap-2 hover:text-slate-300"
-            title="Usuários"
-          >
-            <Users className="w-4 h-4 mr-4" /> Usuários
-          </Link>
+          {user?.role === "0" && (
+            <Link
+              href="/dashboard/users"
+              className="flex items-center gap-2 hover:text-slate-300"
+              title="Usuários"
+            >
+              <Users className="w-4 h-4 mr-4" /> Usuários
+            </Link>
+          )}
           <Link
             href="/dashboard/connections"
             className="flex items-center gap-2 hover:text-slate-300"
