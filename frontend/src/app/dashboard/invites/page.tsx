@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MailPlus, Check, X, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
-import { showErrorToast } from "@/lib/showErrorToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { InviteUser, SentInvite, ReceivedInvite } from "@/types/invite";
@@ -52,7 +52,7 @@ export default function InvitesPage() {
       setPage(res.data.page);
     } catch (err) {
       logError(err, "carregar convites");
-      showErrorToast("Erro ao carregar convites.");
+      handleAxiosError(err, "Erro ao carregar convites.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export default function InvitesPage() {
       showSuccessToast("Convite enviado com sucesso.");
     } catch (err) {
       logError(err, "enviar convite");
-      showErrorToast("Erro ao enviar convite.");
+      handleAxiosError(err, "Erro ao enviar convite.");
     }
   };
 
@@ -95,7 +95,7 @@ export default function InvitesPage() {
       showSuccessToast(successMessages[action]);
     } catch (err) {
       logError(err, `convite ${action}`);
-      showErrorToast(errorMessages[action]);
+      handleAxiosError(err, errorMessages[action]);
     }
   };
 

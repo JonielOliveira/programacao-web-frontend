@@ -10,6 +10,7 @@ import { logError } from "@/lib/logger";
 import api from "@/lib/api";
 import { showSuccessToast } from "@/lib/showSuccessToast";
 import { showErrorToast } from "@/lib/showErrorToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { validatePasswordChange } from "@/lib/validatePassword";
 import { Camera } from "lucide-react";
@@ -63,7 +64,7 @@ export default function UserProfileModal({
       }
     } catch (err) {
       logError(err, "atualizar perfil");
-      showErrorToast("Erro ao atualizar dados: " + (err as Error).message);
+      handleAxiosError(err, "Erro ao atualizar dados.");
     }
 
     try {
@@ -85,7 +86,7 @@ export default function UserProfileModal({
       }
     } catch (err) {
       logError(err, "atualizar senha");
-      showErrorToast("Erro ao atualizar senha: " + (err as Error).message);
+      handleAxiosError(err, "Erro ao atualizar senha.");
     }
 
     try {
@@ -99,7 +100,7 @@ export default function UserProfileModal({
       }
     } catch (err) {
       logError(err, "atualizar foto");
-      showErrorToast("Erro ao atualizar foto: " + (err as Error).message);
+      handleAxiosError(err, "Erro ao atualizar foto.");
     }
   };
 

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import { showSuccessToast } from "@/lib/showSuccessToast";
-import { showErrorToast } from "@/lib/showErrorToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import { User } from "@/types/user";
 
@@ -88,7 +88,7 @@ export default function UsersPage() {
       fetchUsers();
     } catch (err) {
       logError(err, "excluir usuário");
-      showErrorToast("Erro ao excluir usuário.");
+      handleAxiosError(err, "Erro ao excluir usuário.");
     }
   };
 

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Search, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { showSuccessToast } from "@/lib/showSuccessToast";
-import { showErrorToast } from "@/lib/showErrorToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 import ConfirmDialog from "@/components/modals/ConfirmDialog";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import ChatModal from "@/components/modals/ChatModal";
@@ -39,7 +39,7 @@ export default function ConnectionsPage() {
       setPage(res.data.page);
     } catch (err) {
       logError(err, "carregar conexões");
-      showErrorToast("Erro ao carregar conexões.");
+      handleAxiosError(err, "Erro ao carregar conexões.");
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ export default function ConnectionsPage() {
       fetchConnections();
     } catch (err) {
       logError(err, "remover conexão");
-      showErrorToast("Erro ao remover conexão.");
+      handleAxiosError(err, "Erro ao remover conexão.");
     }
   };
 
@@ -73,7 +73,7 @@ export default function ConnectionsPage() {
       setChatUser(user);
     } catch (err) {
       logError(err, "abrir chat");
-      showErrorToast("Erro ao abrir conversa.");
+      handleAxiosError(err, "Erro ao abrir conversa.");
     }
   };
 

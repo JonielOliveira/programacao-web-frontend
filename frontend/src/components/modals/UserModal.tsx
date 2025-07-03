@@ -21,6 +21,7 @@ import api from "@/lib/api";
 import { logError } from "@/lib/logger";
 import { showErrorToast } from "@/lib/showErrorToast";
 import { showSuccessToast } from "@/lib/showSuccessToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 
 type UserForm = {
   id?: string;
@@ -95,7 +96,7 @@ export default function UserModal({
       onSuccess?.();
     } catch (err) {
       logError(err, `${mode === "create" ? "criação" : "edição"} de usuário`);
-      showErrorToast(`Erro ao ${mode === "create" ? "criar" : "atualizar"} o usuário.`);
+      handleAxiosError(err, `Erro ao ${mode === "create" ? "criar" : "atualizar"} o usuário.`);
     }
   };
 

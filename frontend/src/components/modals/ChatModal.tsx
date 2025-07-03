@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
 import api from "@/lib/api";
 import { logError } from "@/lib/logger";
-import { showErrorToast } from "@/lib/showErrorToast";
+import { handleAxiosError } from "@/lib/handleAxiosError";
 import ProfilePhoto from "@/components/user/ProfilePhoto";
 import MessageItem from "@/components/message/MessageItem";
 import EditMessageModal from "@/components/message/EditMessageModal";
@@ -61,7 +61,7 @@ export default function ChatModal({
       });
     } catch (err) {
       logError(err, "carregar mensagens");
-      showErrorToast("Erro ao carregar mensagens.");
+      handleAxiosError(err, "Erro ao carregar mensagens.");
     }
   }, [conversationId]);
 
@@ -75,7 +75,7 @@ export default function ChatModal({
       setNewMessage("");
     } catch (err) {
       logError(err, "enviar mensagem");
-      showErrorToast("Erro ao enviar mensagem.");
+      handleAxiosError(err, "Erro ao enviar mensagem.");
     }
   };
 
@@ -102,7 +102,7 @@ export default function ChatModal({
       );
     } catch (err) {
       logError(err, "editar mensagem");
-      showErrorToast("Erro ao editar mensagem.");
+      handleAxiosError(err, "Erro ao editar mensagem.");
     } finally {
       setEditingMessageId(null);
     }
@@ -124,7 +124,7 @@ export default function ChatModal({
       );
     } catch (err) {
       logError(err, "excluir mensagem");
-      showErrorToast("Erro ao excluir mensagem.");
+      handleAxiosError(err, "Erro ao excluir mensagem.");
     } finally {
       setDeletingMessageId(null);
     }
