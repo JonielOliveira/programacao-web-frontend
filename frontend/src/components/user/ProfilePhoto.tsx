@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import api from "@/lib/api";
+import { logWarn } from "@/lib/logger";
 
 interface ProfilePhotoProps {
   userId: string;
@@ -23,8 +24,8 @@ export default function ProfilePhoto({ userId, size = 72, className = "", versio
         });
         const url = URL.createObjectURL(response.data);
         setPhotoUrl(url);
-      } catch (error) {
-        console.warn("Erro ao carregar a foto de perfil:", error);
+      } catch (err) {
+        logWarn(err, "Carregar foto de perfil");
       }
     };
 
