@@ -168,6 +168,8 @@ export default function UserProfileModal({
                     width={96}
                     height={96}
                     className="rounded-full object-cover border"
+                    unoptimized
+                    priority
                   />
                 ) : (
                   <ProfilePhoto userId={user.id} version={photoVersion} />

@@ -71,6 +71,7 @@ export default function LoginPage() {
             alt="Logo do Join & Chat"
             width={200}
             height={80}
+            unoptimized
             priority
           />
         </div>

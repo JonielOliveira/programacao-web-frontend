@@ -39,8 +39,9 @@ export default function ProfilePhoto({ userId, size = 72, className = "", versio
       width={size}
       height={size}
       className={`rounded-full object-cover border border-white ${className}`}
-      unoptimized
       onClick={onClick}
+      unoptimized
+      priority      
     />
   );
 }

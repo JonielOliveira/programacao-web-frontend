@@ -43,6 +43,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               alt="Painel"
               width={200}
               height={80}
+              unoptimized
               priority
             />
           </Link>
